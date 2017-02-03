@@ -1,0 +1,3 @@
+---
+- name: stop all running instances
+  shell: supervisorctl stop all

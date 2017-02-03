@@ -1,0 +1,51 @@
+---
+- name: get softlink path of current release version
+  shell: echo `readlink -f {{ deploy_dir }}`
+  register: link_version_dir
+
+- name: current softlink if not link latest version
+  set_fact: remove_rolled_back=yes
+  when: link_version_dir.stdout == {{ latest_deploy_dir }}
+
+- debug: msg="exist latest version:{{ remove_rolled_back }}"
+
+- name: get number of released versions
+  shell: echo `ls -1t {{ history_version_dir }} | wc -l`
+  register: versions_count
+
+- name: check input parameters
+  fail:
+    msg: "parameters is null! please input rollback version number,eg. v=1"
+  when: not v
+
+- name: check if not exist input released version(1)
+  fail:
+    msg: "not find input version!"
+  when: remove_rolled_back and versions_count.stdout|int <= {{ v }}
+
+- name: check if not exist input released version(2)
+  fail:
+    msg: "not find input version!"
+  when: not remove_rolled_back and versions_count.stdout|int < {{ v }}
+
+- name: get latest version_no
+  shell: echo `ls -1t {{ history_version_dir }} | head -n 1`
+  register: current_release_version
+
+- name: get need rollback version_no(1)
+  shell: echo `ls -1t {{ history_version_dir }} | head -n {{ v|int + 1 }} | tail -n 1`
+  register: previous_release_version1
+  when: remove_rolled_back
+
+- name: get need rollback version_no(2)
+  shell: echo `ls -1t {{ history_version_dir }} | head -n {{ v }} | tail -n 1`
+  register: previous_release_version2
+  when: not remove_rolled_back
+
+- name: merge previous_release_version1 and previous_release_version2
+  set_fact:
+    previous_release_version: "{{ previous_release_version1 if remove_rolled_back else previous_release_version2 }}"
+
+- name: get need rollback version path
+  command: echo "{{ history_version_dir }}/{{ previous_release_version.stdout }}"
+  register: release_path

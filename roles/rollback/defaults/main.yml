@@ -1,0 +1,6 @@
+---
+latest_version_dir: "/var/www/releases/current/app"
+
+deploy_dir: "/var/www/app"
+
+history_version_dir: "/var/www/releases/versions"

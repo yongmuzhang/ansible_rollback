@@ -1,0 +1,6 @@
+---
+- name: change softlink from current release to rollback version
+  file:
+    state: link
+    path: {{ deploy_dir }}
+    src: "{{ history_version_dir }}/{{ previous_release_version.stdout }}/app"

@@ -1,0 +1,12 @@
+---
+- debug: msg="start rollback, please wait patiently!"
+
+- include: stop.yml
+
+- include: rollback.yml
+
+- include: link.yml
+
+- include: cleanup.yml
+
+- include: start.yml

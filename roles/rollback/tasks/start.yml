@@ -1,0 +1,3 @@
+---
+- name: start all stoped instances
+  shell: supervisorctl start all
